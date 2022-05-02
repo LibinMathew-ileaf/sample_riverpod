@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 void main() {
   runApp( const ProviderScope(child: MyApp()));
 }
-final counterProvider = StateProvider((ref) => 0);
+final counterProvider = StateProvider.autoDispose((ref) => 0);
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -57,6 +57,14 @@ class CounterPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Counter'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              ref.invalidate(counterProvider);// reset state value manually
+            },
+            icon: const Icon(Icons.refresh),
+          ),
+        ],
       ),
       body: Center(
         child: Text(
