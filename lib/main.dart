@@ -2,21 +2,77 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp( ProviderScope(child: MyApp()));
+  runApp( const ProviderScope(child: MyApp()));
 }
-final helloWorldProvider = Provider((_) => 'Hello world');//declare a provider`
+final counterProvider = StateProvider((ref) => 0);
 
-class MyApp extends ConsumerWidget {
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      title: 'Counter App',
+      home: HomePage(),
+    );
+  }
+}
+
+
+class HomePage extends StatelessWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Home'),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          child: const Text('Go to Counter Page'),
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: ((context) => const CounterPage()),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class CounterPage extends ConsumerWidget {
+  const CounterPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final String value = ref.watch(helloWorldProvider);
+    // Using the WidgetRef to get the counter int from the counterProvider.
+    // The watch method makes the widget rebuild whenever the int changes value.
+    //   - something like setState() but automatic
+    final int counter = ref.watch(counterProvider);
 
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Example')),
-        body: Center(
-          child: Text(value),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Counter'),
+      ),
+      body: Center(
+        child: Text(
+          counter.toString(),
+          style: Theme.of(context).textTheme.displayMedium,
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          // Using the WidgetRef to read() the counterProvider just one time.
+          //   - unlike watch(), this will never rebuild the widget automatically
+          // We don't want to get the int but the actual StateNotifier, hence we access it.
+          // StateNotifier exposes the int which we can then mutate (in our case increment).
+          ref.read(counterProvider.notifier).state++;
+        },
       ),
     );
   }
