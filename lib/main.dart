@@ -57,7 +57,7 @@ class CounterPage extends ConsumerWidget {
     // Using the WidgetRef to get the counter int from the counterProvider.
     // The watch method makes the widget rebuild whenever the int changes value.
     //   - something like setState() but automatic
-    final _data = ref.watch(userDataProvider);
+    final _data = ref.watch(interestDataProvider);
 
     return  Scaffold(
         appBar: AppBar(
