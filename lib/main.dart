@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sample_riverpod/providers/data_provider.dart';
+
+
+import 'model/interest_response.dart';
 
 void main() {
   runApp( const ProviderScope(child: MyApp()));
 }
-final counterProvider = StateProvider.autoDispose((ref) => 0);
+
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+
     return const MaterialApp(
       title: 'Counter App',
       home: HomePage(),
@@ -52,36 +57,36 @@ class CounterPage extends ConsumerWidget {
     // Using the WidgetRef to get the counter int from the counterProvider.
     // The watch method makes the widget rebuild whenever the int changes value.
     //   - something like setState() but automatic
-    final int counter = ref.watch(counterProvider);
+    final _data = ref.watch(userDataProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Counter'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              ref.invalidate(counterProvider);// reset state value manually
-            },
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
-      ),
-      body: Center(
-        child: Text(
-          counter.toString(),
-          style: Theme.of(context).textTheme.displayMedium,
+    return  Scaffold(
+        appBar: AppBar(
+          title: const Text('User Profile'),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          // Using the WidgetRef to read() the counterProvider just one time.
-          //   - unlike watch(), this will never rebuild the widget automatically
-          // We don't want to get the int but the actual StateNotifier, hence we access it.
-          // StateNotifier exposes the int which we can then mutate (in our case increment).
-          ref.read(counterProvider.notifier).state++;
-        },
-      ),
-    );
+        body: _data.when(
+          data: (_data) {
+            return Column(
+              children: [
+                ..._data.map((e) => ListView(shrinkWrap: true, children: [
+                  InkWell(
+                    onTap: () =>
+                      {
+
+                        },
+                    child: ListTile(
+                      title: Text(e.name!),
+                      subtitle: Text(e.name!),
+                    ),
+                  ),
+                ])),
+              ],
+            );
+          },
+          error: (err, s) => Text(err.toString()),
+          loading: () => const Center(
+            child: CircularProgressIndicator(),
+          ),
+
+        ));
   }
 }
